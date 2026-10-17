@@ -32,9 +32,6 @@ public class Estudiante {
 	@Column(nullable = false, length = 100)
 	private String apellidos;
 
-	@Column(name = "estatura_m", nullable = false, precision = 5, scale = 2)
-	private BigDecimal estaturaM;
-
 	@Column(name = "peso_kg", nullable = false, precision = 5, scale = 2)
 	private BigDecimal pesoKg;
 

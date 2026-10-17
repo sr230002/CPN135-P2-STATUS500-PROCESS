@@ -36,7 +36,6 @@ class EstudianteServicesImplTest {
 		// 70 / 1.75^2 = 22.8571... -> 22.86
 		assertEquals(new BigDecimal("22.86"), guardado.getImc());
 		assertEquals(new BigDecimal("70"), guardado.getPesoKg());
-		assertEquals(new BigDecimal("1.75"), guardado.getEstaturaM());
 		assertEquals("LP12345", guardado.getCarnet());
 	}
 

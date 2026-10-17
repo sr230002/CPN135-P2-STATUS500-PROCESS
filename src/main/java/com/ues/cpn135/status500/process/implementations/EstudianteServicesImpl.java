@@ -56,7 +56,6 @@ public class EstudianteServicesImpl implements EstudianteService {
 		Estudiante estudiante = Estudiante.builder()
 				.nombres(req.getNombres())
 				.apellidos(req.getApellidos())
-				.estaturaM(estatura)
 				.pesoKg(peso)
 				.imc(imc)
 				.grupoTeorico(req.getGrupoTeorico())
