@@ -1,0 +1,56 @@
+# STATUS500 - API process en Azure (Docker, puerto 7777).
+#
+# Local (solo la base de datos):
+#   docker compose up -d mariadb
+#   -> MariaDB en localhost:3307, base status500process, usuario status500 / status500
+#
+# Cloud (la API dentro de un contenedor):
+#   docker compose up -d --build
+#   docker logs -f status500-process
+#
+# La app NO usa Docker en local: se levanta con `mvnw spring-boot:run` en el 8081.
+
+services:
+  mariadb:
+    image: mariadb:11.4
+    container_name: status500-mariadb
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: status500process
+      MARIADB_USER: status500
+      MARIADB_PASSWORD: status500
+    ports:
+      # 3307 en el host para no chocar con un MySQL/MariaDB local.
+      - "3307:3306"
+    volumes:
+      - ../docs/sql/status500-mariadb.sql:/docker-entrypoint-initdb.d/01-estudiante.sql:ro
+      - mariadb-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  process-api:
+    build: .
+    image: status500-process-api:latest
+    container_name: status500-process
+    ports:
+      - "7777:7777"
+    environment:
+      SERVER_PORT: 7777
+      # En cloud: URL/credenciales de la base del despliegue.
+      # SPRING_DATASOURCE_URL: jdbc:mariadb://HOST:3306/status500process
+      # SPRING_DATASOURCE_USERNAME: usuario
+      # SPRING_DATASOURCE_PASSWORD: clave
+      # Alternativa con los nombres del proyecto:
+      # APP_DATABASE_URL: jdbc:mariadb://HOST:3306/status500process
+      # APP_DATABASE_USERNAME: usuario
+      # APP_DATABASE_PASSWORD: clave
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  mariadb-data:
